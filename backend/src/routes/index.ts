@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { authRouter } from './auth.routes';
+import { repoRouter } from './repo.routes';
+import { projectRouter } from './project.routes';
 
 export const apiRouter = Router();
 export const publicRouter = Router();
@@ -9,5 +11,7 @@ apiRouter.get('/health', (_req, res) => {
 });
 
 apiRouter.use(authRouter);
+apiRouter.use(repoRouter);
+apiRouter.use(projectRouter);
 
-// Repo, project, entry, and public changelog routers are mounted in later milestones.
+// Entry and public changelog routers are mounted in later milestones.
