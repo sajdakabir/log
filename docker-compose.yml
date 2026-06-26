@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: shiplog-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: shiplog
+      POSTGRES_PASSWORD: shiplog
+      POSTGRES_DB: shiplog
+    ports:
+      - "5432:5432"
+    volumes:
+      - shiplog-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shiplog -d shiplog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  shiplog-db-data:
