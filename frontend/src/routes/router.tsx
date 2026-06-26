@@ -5,6 +5,7 @@ import { AuthCallbackPage } from '../pages/AuthCallbackPage';
 import { DashboardPage } from '../pages/DashboardPage';
 import { ConnectRepoPage } from '../pages/ConnectRepoPage';
 import { ProjectPage } from '../pages/ProjectPage';
+import { EntryEditPage } from '../pages/EntryEditPage';
 import { ProjectSettingsPage } from '../pages/ProjectSettingsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { ProtectedRoute } from '../components/ProtectedRoute';
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           { path: '/app', element: <DashboardPage /> },
           { path: '/app/connect', element: <ConnectRepoPage /> },
           { path: '/app/projects/:id', element: <ProjectPage /> },
+          { path: '/app/projects/:id/entries/:entryId', element: <EntryEditPage /> },
           { path: '/app/projects/:id/settings', element: <ProjectSettingsPage /> },
         ],
       },

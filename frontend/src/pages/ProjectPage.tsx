@@ -118,7 +118,11 @@ export function ProjectPage() {
         {entries.length > 0 && (
           <div className="space-y-4">
             {entries.map((entry) => (
-              <EntryCard key={entry.id} entry={entry} />
+              <EntryCard
+                key={entry.id}
+                entry={entry}
+                to={`/app/projects/${project.id}/entries/${entry.id}`}
+              />
             ))}
           </div>
         )}
