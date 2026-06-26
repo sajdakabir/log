@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EntryStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum GenerationStatus {
+  RUNNING
+  DONE
+  FAILED
+}
+
+model User {
+  id             String   @id @default(cuid())
+  githubId       Int      @unique // numeric, stable across rename
+  githubLogin    String
+  name           String?
+  email          String?  @unique
+  avatarUrl      String?
+  accessTokenEnc String?  @db.Text // AES-256-GCM "v1:iv:tag:ct"; never logged/returned
+  scopes         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  projects       Project[]
+}
+
+model Project {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubRepoId  Int // numeric repo id (survives rename)
+  repoOwner     String
+  repoName      String
+  repoFullName  String // "owner/name"
+  defaultBranch String?   @default("main")
+  slug          String    @unique // global -> /{slug}
+  displayName   String?
+  description   String?   @db.Text
+  isPublic      Boolean   @default(true)
+  lastSyncedAt  DateTime? // watermark: GitHub `since=`
+  lastSyncedSha String? // watermark: dedupe lower bound
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  entries     ChangelogEntry[]
+  generations Generation[]
+
+  @@unique([userId, githubRepoId])
+  @@index([userId])
+}
+
+model ChangelogEntry {
+  id           String      @id @default(cuid())
+  projectId    String
+  project      Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title        String
+  summary      String?     @db.Text
+  bodyMarkdown String      @db.Text
+  version      String      @default("Unreleased")
+  changes      Json? // [{ type: "Added"|"Improved"|"Fixed"|"Removed", text }]
+  status       EntryStatus @default(DRAFT)
+  publishedAt  DateTime?
+  sortOrder    Int         @default(0)
+  sourceRefs   Json? // { commits: [sha], prs: [123], tag }
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  @@unique([projectId, version]) // idempotent upsert per version
+  @@index([projectId, status, publishedAt])
+}
+
+model Generation {
+  id          String           @id @default(cuid())
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status      GenerationStatus @default(RUNNING)
+  fingerprint String // hash(headSha, sortedPrNumbers, model)
+  model       String
+  error       String?          @db.Text
+  createdAt   DateTime         @default(now())
+  finishedAt  DateTime?
+
+  @@index([projectId, createdAt])
+}
