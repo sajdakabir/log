@@ -3,6 +3,9 @@ import { LandingPage } from '../pages/LandingPage';
 import { LoginPage } from '../pages/LoginPage';
 import { AuthCallbackPage } from '../pages/AuthCallbackPage';
 import { DashboardPage } from '../pages/DashboardPage';
+import { ConnectRepoPage } from '../pages/ConnectRepoPage';
+import { ProjectPage } from '../pages/ProjectPage';
+import { ProjectSettingsPage } from '../pages/ProjectSettingsPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { AppShell } from '../components/layout/AppShell';
@@ -17,7 +20,12 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppShell />,
-        children: [{ path: '/app', element: <DashboardPage /> }],
+        children: [
+          { path: '/app', element: <DashboardPage /> },
+          { path: '/app/connect', element: <ConnectRepoPage /> },
+          { path: '/app/projects/:id', element: <ProjectPage /> },
+          { path: '/app/projects/:id/settings', element: <ProjectSettingsPage /> },
+        ],
       },
     ],
   },
