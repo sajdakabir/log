@@ -4,8 +4,10 @@ import { requireAuth } from '../middleware/requireAuth';
 import { requireCsrf } from '../middleware/requireCsrf';
 import { loadUser } from '../middleware/loadUser';
 import { validateBody } from '../middleware/validate';
+import { generateRateLimit } from '../middleware/rateLimit';
 import { createProjectSchema, updateProjectSchema } from '../schemas/project.schema';
 import * as project from '../controllers/project.controller';
+import * as generateCtrl from '../controllers/generate.controller';
 
 export const projectRouter = Router();
 
@@ -27,3 +29,12 @@ projectRouter.patch(
   asyncHandler(project.update),
 );
 projectRouter.delete('/projects/:id', requireAuth, requireCsrf, asyncHandler(project.remove));
+
+projectRouter.post(
+  '/projects/:id/generate',
+  requireAuth,
+  requireCsrf,
+  loadUser,
+  generateRateLimit,
+  asyncHandler(generateCtrl.generate),
+);

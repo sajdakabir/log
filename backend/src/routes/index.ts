@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { authRouter } from './auth.routes';
 import { repoRouter } from './repo.routes';
 import { projectRouter } from './project.routes';
+import { entryRouter } from './entry.routes';
 
 export const apiRouter = Router();
 export const publicRouter = Router();
@@ -13,5 +14,6 @@ apiRouter.get('/health', (_req, res) => {
 apiRouter.use(authRouter);
 apiRouter.use(repoRouter);
 apiRouter.use(projectRouter);
+apiRouter.use(entryRouter);
 
-// Entry and public changelog routers are mounted in later milestones.
+// The public changelog router is mounted in M5.
