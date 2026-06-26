@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { authRouter } from './auth.routes';
 
 export const apiRouter = Router();
 export const publicRouter = Router();
@@ -7,5 +8,6 @@ apiRouter.get('/health', (_req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-// Feature routers (auth, repos, projects, entries, public changelog) are mounted
-// onto these in later milestones.
+apiRouter.use(authRouter);
+
+// Repo, project, entry, and public changelog routers are mounted in later milestones.
