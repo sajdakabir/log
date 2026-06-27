@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { CHANGE_TYPES, type ChangeItem, type ChangeType } from '@shiplog/shared';
 import { ApiError } from '../lib/api';
-import { useDeleteEntry, useEntry, useUpdateEntry } from '../hooks/useEntry';
+import { useDeleteEntry, useEntry, usePublishEntry, useUpdateEntry } from '../hooks/useEntry';
 import { Spinner } from '../components/ui/Spinner';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
@@ -17,6 +17,7 @@ export function EntryEditPage() {
   const entryQuery = useEntry(id, entryId);
   const update = useUpdateEntry(id, entryId);
   const del = useDeleteEntry(id);
+  const publish = usePublishEntry(id);
   const navigate = useNavigate();
 
   const [form, setForm] = useState({ title: '', version: '', summary: '', bodyMarkdown: '' });
@@ -177,9 +178,21 @@ export function EntryEditPage() {
           {saved && <p className="text-sm text-green-600">Saved.</p>}
 
           <div className="flex items-center justify-between pt-1">
-            <Button type="submit" disabled={update.isPending}>
-              {update.isPending ? 'Saving…' : 'Save'}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button type="submit" disabled={update.isPending}>
+                {update.isPending ? 'Saving…' : 'Save'}
+              </Button>
+              {entry.status === 'DRAFT' && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => publish.mutate(entryId)}
+                  disabled={publish.isPending}
+                >
+                  {publish.isPending ? 'Publishing…' : 'Publish'}
+                </Button>
+              )}
+            </div>
             <Button type="button" variant="danger" onClick={handleDelete} disabled={del.isPending}>
               Delete
             </Button>

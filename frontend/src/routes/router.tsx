@@ -7,6 +7,7 @@ import { ConnectRepoPage } from '../pages/ConnectRepoPage';
 import { ProjectPage } from '../pages/ProjectPage';
 import { EntryEditPage } from '../pages/EntryEditPage';
 import { ProjectSettingsPage } from '../pages/ProjectSettingsPage';
+import { PublicChangelogPage } from '../pages/PublicChangelogPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { ProtectedRoute } from '../components/ProtectedRoute';
 import { AppShell } from '../components/layout/AppShell';
@@ -31,5 +32,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  // Public hosted changelog. Static routes above rank higher than this dynamic
+  // single-segment route; the catch-all stays last.
+  { path: '/:slug', element: <PublicChangelogPage /> },
   { path: '*', element: <NotFoundPage /> },
 ]);

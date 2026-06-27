@@ -29,3 +29,14 @@ export function useDeleteEntry(projectId: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.entries(projectId) }),
   });
 }
+
+export function usePublishEntry(projectId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (entryId: string) => api.post<EntryDTO>(API.publish(projectId, entryId)),
+    onSuccess: (data) => {
+      queryClient.setQueryData(queryKeys.entry(projectId, data.id), data);
+      queryClient.invalidateQueries({ queryKey: queryKeys.entries(projectId) });
+    },
+  });
+}
