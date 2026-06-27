@@ -3,9 +3,13 @@ import { authRouter } from './auth.routes';
 import { repoRouter } from './repo.routes';
 import { projectRouter } from './project.routes';
 import { entryRouter } from './entry.routes';
+import * as publicCtrl from '../controllers/public.controller';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const apiRouter = Router();
 export const publicRouter = Router();
+
+publicRouter.get('/changelog/:slug', asyncHandler(publicCtrl.getChangelog));
 
 apiRouter.get('/health', (_req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });

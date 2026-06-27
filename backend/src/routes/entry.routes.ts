@@ -23,5 +23,9 @@ entryRouter.delete(
   requireCsrf,
   asyncHandler(entry.remove),
 );
-
-// The publish route is added in M5.
+entryRouter.post(
+  '/projects/:id/entries/:entryId/publish',
+  requireAuth,
+  requireCsrf,
+  asyncHandler(entry.publish),
+);

@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import type { ChangelogEntry, Prisma, Project } from '@prisma/client';
 import type { Octokit } from '@octokit/rest';
 import { prisma } from '../lib/prisma';
+import { AppError } from '../utils/AppError';
 import * as githubService from './github.service';
 import * as aiService from './ai.service';
 import type { RepoActivity } from './github.service';
@@ -28,6 +29,39 @@ function computeFingerprint(activity: RepoActivity, model: string): string {
 
 export function listProjectEntries(projectId: string): Promise<ChangelogEntry[]> {
   return prisma.changelogEntry.findMany({ where: { projectId }, orderBy: { updatedAt: 'desc' } });
+}
+
+export interface PublicChangelog {
+  project: Project;
+  versions: { version: string; entries: ChangelogEntry[] }[];
+}
+
+/** Public, unauthenticated changelog for a slug — published entries only, grouped by version. */
+export async function getPublicChangelog(slug: string): Promise<PublicChangelog> {
+  const project = await prisma.project.findUnique({ where: { slug } });
+  if (!project || !project.isPublic) {
+    throw AppError.notFound('Changelog not found');
+  }
+
+  const entries = await prisma.changelogEntry.findMany({
+    where: { projectId: project.id, status: 'PUBLISHED' },
+    orderBy: { publishedAt: 'desc' },
+  });
+
+  // Group by version, preserving the newest-first ordering.
+  const versions: { version: string; entries: ChangelogEntry[] }[] = [];
+  const byVersion = new Map<string, ChangelogEntry[]>();
+  for (const entry of entries) {
+    let bucket = byVersion.get(entry.version);
+    if (!bucket) {
+      bucket = [];
+      byVersion.set(entry.version, bucket);
+      versions.push({ version: entry.version, entries: bucket });
+    }
+    bucket.push(entry);
+  }
+
+  return { project, versions };
 }
 
 async function advanceWatermark(project: Project, activity: RepoActivity): Promise<void> {

@@ -54,3 +54,15 @@ export async function deleteEntry(
   const entry = await getOwnedEntry(userId, projectId, entryId);
   await prisma.changelogEntry.delete({ where: { id: entry.id } });
 }
+
+export async function publishEntry(
+  userId: string,
+  projectId: string,
+  entryId: string,
+): Promise<ChangelogEntry> {
+  const entry = await getOwnedEntry(userId, projectId, entryId);
+  return prisma.changelogEntry.update({
+    where: { id: entry.id },
+    data: { status: 'PUBLISHED', publishedAt: entry.publishedAt ?? new Date() },
+  });
+}

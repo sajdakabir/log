@@ -33,3 +33,8 @@ export async function remove(req: Request, res: Response): Promise<void> {
   await entryService.deleteEntry(req.userId!, req.params.id!, req.params.entryId!);
   res.status(204).end();
 }
+
+export async function publish(req: Request, res: Response): Promise<void> {
+  const entry = await entryService.publishEntry(req.userId!, req.params.id!, req.params.entryId!);
+  res.json(toEntryDTO(entry));
+}
