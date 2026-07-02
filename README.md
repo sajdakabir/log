@@ -11,7 +11,7 @@ drafts, and publish them to a hosted public changelog at `/{slug}`.
 - **Frontend** — React + Vite + TypeScript + Tailwind + TanStack Query (`/frontend`)
 - **Backend** — Node + Express + TypeScript + Prisma (`/backend`)
 - **Shared** — TypeScript DTOs + API path constants (`/shared`)
-- **DB** — PostgreSQL (via Docker in dev)
+- **DB** — MongoDB (Atlas) via Prisma
 - **AI** — OpenAI (`gpt-4o-mini`)
 - **Auth** — GitHub OAuth (`read:user public_repo`), on-demand REST fetch
 
@@ -24,21 +24,19 @@ in prod Express serves the built SPA under one domain.
 # 1. install
 npm install
 
-# 2. start Postgres
-npm run db:up
-
-# 3. configure backend env (generates dev secrets)
+# 2. configure backend env
 cp backend/.env.example backend/.env
-#   then set SESSION_JWT_SECRET and TOKEN_ENC_KEY (see backend/.env.example)
+#   set DATABASE_URL to your MongoDB Atlas connection string (with a db name, e.g. /shiplog)
+#   set SESSION_JWT_SECRET and TOKEN_ENC_KEY (openssl rand -base64 32)
 #   and, for auth, GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET / OPENAI_API_KEY
 
-# 4. migrate + seed
-npm run db:migrate
+# 3. push schema + seed
+npm run db:push
 npm run db:seed
 
-# 5. run both dev servers
+# 4. run both dev servers
 npm run dev
-#   web → http://localhost:5173   api → http://localhost:4000
+#   web → http://localhost:5173   api → http://localhost:4100
 ```
 
 ## Project layout

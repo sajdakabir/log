@@ -29,8 +29,9 @@ export async function updateEntry(
   if (input.summary !== undefined) data.summary = input.summary;
   if (input.bodyMarkdown !== undefined) data.bodyMarkdown = input.bodyMarkdown;
   if (input.changes !== undefined) {
+    // MongoDB has no DB-null vs JSON-null distinction; plain null is correct here.
     data.changes =
-      input.changes === null ? Prisma.JsonNull : (input.changes as unknown as Prisma.InputJsonValue);
+      input.changes === null ? null : (input.changes as unknown as Prisma.InputJsonValue);
   }
 
   if (input.version !== undefined && input.version !== entry.version) {
