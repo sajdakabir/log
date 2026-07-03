@@ -36,7 +36,7 @@ npm run db:seed
 
 # 4. run both dev servers
 npm run dev
-#   web → http://localhost:5173   api → http://localhost:4100
+#   web → http://localhost:3000   api → http://localhost:8080
 ```
 
 ## Project layout
